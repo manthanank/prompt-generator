@@ -1,22 +1,19 @@
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Gemini {
-  private apiKey = environment.geminiApiKey;
-  private apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`;
+  private apiUrl = environment.apiUrl;
 
   http = inject(HttpClient);
 
   constructor() {}
 
   generatePrompt(userPrompt: string) {
-    const body = {
-      contents: [{ parts: [{ text: userPrompt }] }]
-    };
+    const body = { userPrompt };
     return this.http.post<any>(this.apiUrl, body);
   }
 }

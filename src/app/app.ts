@@ -6,10 +6,11 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Gemini } from './services/gemini';
+import { MarkdownComponent } from "ngx-markdown";
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule],
+  imports: [FormsModule, MarkdownComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,7 +49,7 @@ export class App {
 
     this.geminiService.generatePrompt(styledInput).subscribe({
       next: (res) => {
-        const text = res?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
+        const text = res?.text || 'No response';
         this.generatedPrompt.set(text);
         this.saveToHistory(text);
         this.loading.set(false);

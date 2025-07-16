@@ -1,6 +1,4 @@
-declare const apiKey: string;
-
 export const environment = {
   production: false,
-  geminiApiKey: apiKey,
+  apiUrl: 'http://localhost:3000/generate-content',
 };
