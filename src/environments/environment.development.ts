@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:3000/generate-content',
+  apiUrl: 'https://prompt-generator-api.vercel.app/generate-content',
 };
