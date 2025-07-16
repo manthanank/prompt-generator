@@ -1,59 +1,86 @@
-# PromptGenerator
+# Prompt Generator
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.0.
+Instantly create high-quality AI prompts for any use case. Powered by Angular, Tailwind CSS, and Google Gemini API.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- Generate creative, formal, funny, or concise prompts using Gemini AI
+- Save prompt history and mark favorites (persisted in local storage)
+- Copy generated prompts to clipboard
+- Dark mode toggle
+- Responsive, modern UI styled with Tailwind CSS
 
-```bash
-ng serve
-```
+## Tech Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- [Angular 20+](https://angular.io/) (standalone components, signals, OnPush, reactive forms)
+- [Tailwind CSS 4+](https://tailwindcss.com/) (utility-first styling)
+- [Google Gemini API](https://ai.google.dev/gemini-api/docs)
 
-## Code scaffolding
+## Getting Started
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Prerequisites
 
-```bash
-ng generate component component-name
-```
+- Node.js 18+
+- npm 9+
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+### Installation
 
 ```bash
-ng build
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Environment Setup
 
-## Running unit tests
+Set your Gemini API key in `src/environments/environment.ts`:
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+```ts
+export const environment = {
+  production: false,
+  geminiApiKey: 'YOUR_GEMINI_API_KEY',
+};
+```
+
+### Development Server
 
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
+Visit [http://localhost:4200](http://localhost:4200) to use the app.
 
-For end-to-end (e2e) testing, run:
+### Build
 
 ```bash
-ng e2e
+npm run build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Usage
 
-## Additional Resources
+1. Select a prompt style (Creative, Formal, Funny, Concise)
+2. Enter your prompt description
+3. Click "Generate Prompt"
+4. Copy or save generated prompts as favorites
+5. Toggle dark mode as desired
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Project Structure
+
+```tree
+src/
+  app/
+    app.ts         # Main app component (logic)
+    app.html       # Main app template (UI)
+    services/
+      gemini.ts    # Gemini API integration service
+  environments/
+    environment.ts # API key config
+  styles.css       # Tailwind CSS import and dark mode tweaks
+```
+
+## Styling
+
+- 100% Tailwind CSS for all UI elements
+- No custom CSS except minimal dark mode helpers
+
+## License
+
+[MIT](LICENSE)
