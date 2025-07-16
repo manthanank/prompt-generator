@@ -51,7 +51,7 @@ Visit [http://localhost:4200](http://localhost:4200) to use the app.
 ### Build
 
 ```bash
-npm run build
+ng build --define "apiKey='API_KEY'"
 ```
 
 ## Usage
