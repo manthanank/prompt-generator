@@ -3,10 +3,14 @@ import {
   signal,
   ChangeDetectionStrategy,
   inject,
+  computed,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Gemini } from './services/gemini';
-import { MarkdownComponent } from "ngx-markdown";
+import { MarkdownComponent } from 'ngx-markdown';
+import { Visit } from './models/visit.model';
+import { httpResource } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -25,12 +29,37 @@ export class App {
   promptHistory = signal<string[]>([]);
   favoritePrompts = signal<string[]>([]);
   darkMode = signal(false);
+  projectName = signal<string>('');
 
+  private apiURL = environment.trackingApiUrl;
   private geminiService = inject(Gemini);
 
+  visitResource = httpResource<Visit>(() => ({
+    url: this.apiURL,
+    method: 'POST',
+    body: { projectName: this.projectName() },
+  }));
+
+  visitorCount = computed(() => {
+    const value = this.visitResource.value();
+    return value?.uniqueVisitors ?? 0;
+  });
+
+  isVisitorCountLoading = computed(() => this.visitResource.isLoading());
+
+  visitorCountError = computed(() => {
+    const error = this.visitResource.error();
+    return error ? error.message : null;
+  });
+
   ngOnInit() {
-    this.promptHistory.set(JSON.parse(localStorage.getItem('prompt-history') || '[]'));
-    this.favoritePrompts.set(JSON.parse(localStorage.getItem('favorites') || '[]'));
+    this.trackVisit();
+    this.promptHistory.set(
+      JSON.parse(localStorage.getItem('prompt-history') || '[]')
+    );
+    this.favoritePrompts.set(
+      JSON.parse(localStorage.getItem('favorites') || '[]')
+    );
     const storedDarkMode = localStorage.getItem('dark-mode');
     if (storedDarkMode !== null) {
       this.darkMode.set(storedDarkMode === 'true');
@@ -38,6 +67,11 @@ export class App {
     } else {
       this.darkMode.set(document.documentElement.classList.contains('dark'));
     }
+  }
+
+  private trackVisit(): void {
+    // Update the signal to trigger the httpResource
+    this.projectName.set(this.title());
   }
 
   onGenerate() {
@@ -57,17 +91,20 @@ export class App {
       error: () => {
         this.generatedPrompt.set('Error generating prompt');
         this.loading.set(false);
-      }
+      },
     });
   }
 
   saveToHistory(prompt: string) {
-    this.promptHistory.update(history => [prompt, ...history].slice(0, 10));
-    localStorage.setItem('prompt-history', JSON.stringify(this.promptHistory()));
+    this.promptHistory.update((history) => [prompt, ...history].slice(0, 10));
+    localStorage.setItem(
+      'prompt-history',
+      JSON.stringify(this.promptHistory())
+    );
   }
 
   saveFavorite(prompt: string) {
-    this.favoritePrompts.update(favs => [...favs, prompt]);
+    this.favoritePrompts.update((favs) => [...favs, prompt]);
     localStorage.setItem('favorites', JSON.stringify(this.favoritePrompts()));
   }
 
@@ -78,7 +115,7 @@ export class App {
   }
 
   toggleDarkMode() {
-    this.darkMode.update(d => !d);
+    this.darkMode.update((d) => !d);
     document.documentElement.classList.toggle('dark', this.darkMode());
     localStorage.setItem('dark-mode', String(this.darkMode()));
   }
