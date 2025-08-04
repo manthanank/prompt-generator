@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -7,17 +7,16 @@ import { Auth } from './auth';
 import { GenerateResponse, AnonymousStatusResponse, FreePromptCheckResponse } from '../models/user.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class Gemini {
+export class ContentService {
   private apiUrl = environment.apiUrl;
   private sessionId: string;
 
-  http = inject(HttpClient);
-  private authService = inject(Auth);
-
-  constructor() {
-    // Generate session ID for anonymous users
+  constructor(
+    private http: HttpClient,
+    private authService: Auth
+  ) {
     this.sessionId = this.getSessionId();
   }
 
@@ -30,7 +29,7 @@ export class Gemini {
     return sessionId;
   }
 
-  generatePrompt(userPrompt: string): Observable<GenerateResponse> {
+  generateContent(userPrompt: string): Observable<GenerateResponse> {
     const token = this.authService.token;
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'
@@ -83,6 +82,15 @@ export class Gemini {
       catchError(error => {
         console.error('Check free prompt error:', error);
         return throwError(() => error.error?.error || 'Failed to check free prompt status');
+      })
+    );
+  }
+
+  clearSessions(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/api/clear-sessions`, {}).pipe(
+      catchError(error => {
+        console.error('Clear sessions error:', error);
+        return throwError(() => error.error?.error || 'Failed to clear sessions');
       })
     );
   }
