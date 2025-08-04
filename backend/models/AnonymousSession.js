@@ -32,7 +32,7 @@ anonymousSessionSchema.index({ sessionId: 1 });
 anonymousSessionSchema.index({ timestamp: 1 });
 anonymousSessionSchema.index({ ipAddress: 1, timestamp: 1 }); // For IP-based session checks
 
-// TTL index to automatically delete old sessions after 24 hours
+// TTL index to automatically delete old sessions after 24 hours (matches the device limit)
 anonymousSessionSchema.index({ timestamp: 1 }, { expireAfterSeconds: 24 * 60 * 60 });
 
 export default mongoose.model('AnonymousSession', anonymousSessionSchema);

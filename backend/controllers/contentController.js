@@ -19,7 +19,7 @@ export const generateContent = async (req, res) => {
         return res.status(401).json({ error: 'Invalid token' });
       }
     } else {
-      // Anonymous user - STRICTLY ONE PROMPT ONLY
+      // Anonymous user - ONE PROMPT PER DEVICE/IP
       const sessionId = req.sessionId;
 
       try {
@@ -31,7 +31,7 @@ export const generateContent = async (req, res) => {
             error: error.message,
             userType: 'anonymous',
             requiresLogin: true,
-            message: 'You have already used your free prompt. Please register or login for unlimited access.'
+            message: 'You have already used your free prompt for this device today. Please try again tomorrow or register/login for unlimited access.'
           });
         }
         throw error;
@@ -61,7 +61,8 @@ export const checkFreePromptUsed = async (req, res) => {
 export const getAnonymousStatus = async (req, res) => {
   try {
     const sessionId = req.headers['x-session-id'];
-    const result = await ContentService.getAnonymousStatus(sessionId);
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const result = await ContentService.getAnonymousStatus(sessionId, ipAddress);
     res.json(result);
   } catch (error) {
     console.error('Anonymous status error:', error);
