@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000',
+  apiUrl: 'https://prompt-generator-api.vercel.app',
   trackingApiUrl: 'https://visitor-tracking-api.vercel.app',
 };
