@@ -48,7 +48,7 @@ NODE_ENV=development
 JWT_SECRET=your-secret-key-change-in-production
 
 # MongoDB Connection
-MONGODB_URI=mongodb://localhost:27017/prompt-generator
+MONGODB_URI=your-mongodb-connection-string-here
 
 # Gemini API Key
 GEMINI_API_KEY=your-gemini-api-key-here
