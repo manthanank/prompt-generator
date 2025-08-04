@@ -22,6 +22,10 @@ const anonymousSessionSchema = new mongoose.Schema({
   userAgent: {
     type: String,
     required: false
+  },
+  deviceFingerprint: {
+    type: String,
+    required: false
   }
 }, {
   timestamps: true
@@ -31,6 +35,7 @@ const anonymousSessionSchema = new mongoose.Schema({
 anonymousSessionSchema.index({ sessionId: 1 });
 anonymousSessionSchema.index({ timestamp: 1 });
 anonymousSessionSchema.index({ ipAddress: 1, timestamp: 1 }); // For IP-based session checks
+anonymousSessionSchema.index({ deviceFingerprint: 1, timestamp: 1 }); // For device fingerprint checks
 
 // TTL index to automatically delete old sessions after 24 hours (matches the device limit)
 anonymousSessionSchema.index({ timestamp: 1 }, { expireAfterSeconds: 24 * 60 * 60 });

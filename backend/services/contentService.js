@@ -12,6 +12,19 @@ if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your-gemini-ap
 }
 
 export class ContentService {
+  // Create a device fingerprint for better device identification
+  static createDeviceFingerprint(sessionId, userAgent, ipAddress) {
+    // Extract key browser/device info from user agent
+    const browserInfo = userAgent.match(/\(([^)]+)\)/)?.[1] || '';
+    const platformInfo = userAgent.match(/(Windows|Mac|Linux|Android|iPhone|iPad)/)?.[1] || '';
+
+    return {
+      sessionId,
+      browserFingerprint: `${platformInfo}_${browserInfo}`.substring(0, 100),
+      ipAddress
+    };
+  }
+
   // Generate AI content for authenticated user
   static async generateContentForUser(userId, userPrompt) {
     const user = await User.findById(userId);
@@ -40,26 +53,31 @@ export class ContentService {
     };
   }
 
-  // Generate AI content for anonymous user - ONE PROMPT PER DEVICE/IP
+  // Generate AI content for anonymous user - ONE PROMPT PER DEVICE/SESSION
   static async generateContentForAnonymous(sessionId, userPrompt, req) {
     const ipAddress = req.ip || req.connection.remoteAddress;
+    const userAgent = req.get('User-Agent') || '';
 
-    // Check if this IP has already made a request in the last 24 hours (one prompt per device/day)
-    const existingIPSession = await AnonymousSession.findOne({
-      ipAddress,
+    // Create a device fingerprint combining session ID, user agent, and IP
+    const deviceFingerprint = this.createDeviceFingerprint(sessionId, userAgent, ipAddress);
+
+    // Check if this device fingerprint has already made a request in the last 24 hours
+    const existingSession = await AnonymousSession.findOne({
+      sessionId: sessionId, // Primary check by session ID (device-specific)
       timestamp: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Last 24 hours
     });
 
-    if (existingIPSession) {
+    if (existingSession) {
       throw new Error('Anonymous users can only generate 1 prompt per device per day. Please register/login for unlimited access.');
     }
 
-    // Create new anonymous session (store by IP and session for tracking)
+    // Create new anonymous session (store by session ID, device fingerprint, and IP for tracking)
     const anonymousSession = new AnonymousSession({
       sessionId,
       prompt: userPrompt,
       ipAddress: ipAddress,
-      userAgent: req.get('User-Agent')
+      userAgent: userAgent,
+      deviceFingerprint: deviceFingerprint.browserFingerprint
     });
     await anonymousSession.save();
 
@@ -89,8 +107,8 @@ export class ContentService {
 
   // Get anonymous user status
   static async getAnonymousStatus(sessionId, ipAddress = null) {
-    // If no IP provided, can't check device-specific status
-    if (!ipAddress) {
+    // If no session ID provided, can't check device-specific status
+    if (!sessionId) {
       return {
         hasUsedFreePrompt: false,
         userType: 'anonymous',
@@ -99,17 +117,17 @@ export class ContentService {
       };
     }
 
-    // Check if this IP has used their free prompt in the last 24 hours
-    const existingIPSession = await AnonymousSession.findOne({
-      ipAddress,
+    // Check if this session or similar device has used their free prompt in the last 24 hours
+    const existingSession = await AnonymousSession.findOne({
+      sessionId: sessionId, // Primary check by session ID (device-specific)
       timestamp: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
     });
 
     return {
-      hasUsedFreePrompt: !!existingIPSession,
+      hasUsedFreePrompt: !!existingSession,
       userType: 'anonymous',
-      remainingPrompts: existingIPSession ? 0 : 1,
-      message: existingIPSession
+      remainingPrompts: existingSession ? 0 : 1,
+      message: existingSession
         ? 'You have used your free prompt for this device today. Try again tomorrow or register/login for unlimited access!'
         : 'You have 1 free prompt remaining for this device today'
     };
@@ -117,13 +135,13 @@ export class ContentService {
 
   // Check if anonymous user has used their free prompt
   static async checkFreePromptUsed(sessionId, ipAddress) {
-    // Check by IP address (last 24 hours) - device-based limiting
-    const ipCheck = await AnonymousSession.findOne({
-      ipAddress,
+    // Check by session ID (primary) and IP address as fallback (last 24 hours)
+    const existingSession = await AnonymousSession.findOne({
+      sessionId: sessionId, // Primary check by session ID (device-specific)
       timestamp: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
     });
 
-    const hasUsedFreePrompt = !!ipCheck;
+    const hasUsedFreePrompt = !!existingSession;
 
     return {
       hasUsedFreePrompt,
