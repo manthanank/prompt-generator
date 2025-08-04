@@ -39,8 +39,11 @@ const startServer = async () => {
       console.log('  - GET /api/check-free-prompt - Check if free prompt used');
       console.log('🧪 Testing:');
       console.log('  - POST /api/clear-sessions - Clear all sessions');
+      console.log('🏠 Root:');
+      console.log('  - GET / - API information and documentation');
       console.log('💚 Health:');
       console.log('  - GET /health - Server health check');
+      console.log('  - GET /api/status - Detailed API status');
     });
   } catch (error) {
     console.error('Failed to start server:', error);
