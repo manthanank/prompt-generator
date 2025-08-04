@@ -23,34 +23,110 @@
   ],
   "item": [
     {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/health",
-          "host": ["{{baseUrl}}"],
-          "path": ["health"]
-        },
-        "description": "Check if the server is running and healthy"
-      },
-      "response": [],
-      "event": [
+      "name": "API Information",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Response has status field\", function () {",
-              "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData).to.have.property('status');",
-              "    pm.expect(jsonData.status).to.eql('OK');",
-              "});"
-            ]
-          }
+          "name": "Root Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Get API information, version, and available endpoints documentation"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has API info\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData).to.have.property('version');",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "    pm.expect(jsonData).to.have.property('documentation');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if the server is running and healthy"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has status field\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "    pm.expect(jsonData.status).to.eql('OK');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "status"]
+            },
+            "description": "Get detailed API status including uptime, environment, version, and available endpoints"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has detailed status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "    pm.expect(jsonData).to.have.property('timestamp');",
+                  "    pm.expect(jsonData).to.have.property('uptime');",
+                  "    pm.expect(jsonData).to.have.property('environment');",
+                  "    pm.expect(jsonData).to.have.property('version');",
+                  "    pm.expect(jsonData).to.have.property('endpoints');",
+                  "    pm.expect(jsonData).to.have.property('database');",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -397,38 +473,6 @@
       "name": "Testing & Debug",
       "item": [
         {
-          "name": "Clear All Sessions",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/clear-sessions",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "clear-sessions"]
-            },
-            "description": "Clear all anonymous sessions (for testing purposes). Use this to reset anonymous user limits."
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has message\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('message');",
-                  "    pm.expect(jsonData.message).to.include('cleared');",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
           "name": "Test Content Routes",
           "request": {
             "method": "GET",
@@ -454,6 +498,38 @@
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.have.property('message');",
                   "    pm.expect(jsonData.message).to.include('working');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Clear All Sessions",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clear-sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clear-sessions"]
+            },
+            "description": "Clear all anonymous sessions (for testing purposes). Use this to reset anonymous user limits."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.include('cleared');",
                   "});"
                 ]
               }
