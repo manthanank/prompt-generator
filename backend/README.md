@@ -319,7 +319,7 @@ curl -X POST http://localhost:3000/api/clear-sessions
 NODE_ENV=production
 PORT=3000
 JWT_SECRET=your-super-secure-jwt-secret
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/prompt-generator
+MONGODB_URI=your-mongodb-connection-string-here
 GEMINI_API_KEY=your-gemini-api-key
 ```
 

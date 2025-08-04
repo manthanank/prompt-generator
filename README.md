@@ -77,9 +77,7 @@ NODE_ENV=development
 JWT_SECRET=your-secret-key-change-in-production
 
 # MongoDB Connection
-MONGODB_URI=mongodb://localhost:27017/prompt-generator
-# Or for MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/prompt-generator
+MONGODB_URI=your-mongodb-connection-string-here
 
 # Gemini API Key
 GEMINI_API_KEY=your-gemini-api-key-here
@@ -239,7 +237,7 @@ prompt-generator/
 NODE_ENV=production
 PORT=3000
 JWT_SECRET=your-super-secure-jwt-secret
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/prompt-generator
+MONGODB_URI=your-mongodb-connection-string-here
 GEMINI_API_KEY=your-gemini-api-key
 ```
 
